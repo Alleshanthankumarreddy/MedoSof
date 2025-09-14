@@ -9,6 +9,7 @@ import staffModel from "./models/staffModel.js";
 import ownerModel from "./models/ownerModel.js";
 import rackModel from "./models/rackModel.js";
 import medicineModel from "./models/medicineModel.js"
+import medicineBatchModel from "./models/medicineBatchModel.js";
 
 import staffRouter from "./routes/staffRoutes.js";
 import ownerRouter from "./routes/ownerRoutes.js";

@@ -69,22 +69,26 @@ const addMedicine = async (req, res) => {
 
 const ExpiredMedicines = async (req, res) => {
     try {
-        const expiredBatches = await medicineBatchModel
-        .find({ expiryDate: { $lt: new Date() } })
-        .populate("medicineId", "medicineCode")
-        .lean();
 
-         const expiredTablets = expiredBatches.map(batch => {
-            if (batch.medicineId) {
-                return {
-                batchNumber: batch.batchNumber,
-                medicineCode: batch.medicineId.medicineCode
-                };
-            }
-            return null;
+        const batches = await medicineBatchModel.find().lean();
+
+        const expiredBatches =batches.filter((batch) => {
+          const currentDate = new Date();
+          const expiredDate = new Date(batch.expiryDate);
+          return currentDate >= expiredDate
+        })
+
+        const expiredTablets = expiredBatches.map(batch => {
+          if (batch.medicineId) {
+              return {
+              batchNumber: batch.batchNumber,
+              medicineCode: batch.medicineId.medicineCode
+              };
+          }
+          return null;
         })
         .filter(Boolean);
-      
+        if(expiredTablets.length === 0) return res.json({success : false , message : "There are no expired medicines"})
         return res.json({success : true, expiredTablets });
       
     } catch (err) {
@@ -128,17 +132,32 @@ const searchMedicine = async (req,res) => {
         if (!medicineCode) {
           return res.status(400).json({ success: false, error: "medicineCode is required" });
         }
-    
+        
         const medicine = await medicineModel.findOne({ medicineCode });
     
         if (!medicine) {
           return res.status(404).json({ success: false, error: "Medicine not found" });
         }
-    
-        return res.json({ success: true, medicine });
+        
+        const medicineId = medicine._id
+
+        const medicineBatches = await medicineBatchModel.find({ medicineId });
+
+        console.log(medicineBatches)
+        
+        if (!medicineBatches ||   medicineBatches.length === 0) {
+          return res.status(404).json({ success: false, error: "No batches found for this medicine" });
+        }
+
+        const validBatches = await medicineBatchModel.find({
+            medicineId,
+            expiryDate: { $gt: new Date() }
+        });
+
+        return res.status(200).json({success : true, validBatches})
     }catch (err) {
         console.error(err);
         return res.status(500).json({ success: false, error: "Server error" });
     }
 }
-export { addMedicine, viewAllMedicines, ExpiredMedicines,deleteMedicine };
+export { addMedicine, viewAllMedicines, ExpiredMedicines,deleteMedicine,searchMedicine };

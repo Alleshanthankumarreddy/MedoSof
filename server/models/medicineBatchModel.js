@@ -1,4 +1,4 @@
-import mongoose from 'mogoose'
+import mongoose from 'mongoose'
 
 const medicineBatchSchema = new mongoose.Schema({
 
