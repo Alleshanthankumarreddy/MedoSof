@@ -1,0 +1,106 @@
+import mongoose from "mongoose";
+
+userSchema
+const userSchema = new mongoose.Schema({
+  fullName: { type: String, required: true },
+  medicalShopName: { type: String },
+  medicalShopAddress: { type: String },
+  email: { type: String, required: true, unique: true },
+  passwordHash: { type: String, required: true },
+  role: { type: String, enum: ["Owner", "Staff"], default: "Owner" }
+}, { timestamps: true });
+export default mongoose.models.User || mongoose.model("User", userSchema);
+
+vendorSchema
+const vendorSchema = new mongoose.Schema({
+  vendorName: { type: String, required: true },
+  address: { type: String },
+  contactNumber: { type: String },
+  email: { type: String },
+  gstNumber: { type: String }
+}, { timestamps: true });
+
+export default mongoose.models.Vendor || mongoose.model("Vendor", vendorSchema);
+
+rackSchema
+const rackSchema = new mongoose.Schema({
+  rackNumber: { type: String, required: true, unique: true },
+  locationDescription: { type: String }
+}, { timestamps: true });
+
+export default mongoose.models.Rack || mongoose.model("Rack", rackSchema);
+
+medicineSchema
+const medicineSchema = new mongoose.Schema({
+  medicineCode: { type: String, required: true, unique: true },
+  tradeName: { type: String, required: true },
+  genericName: { type: String, required: true },
+  description: { type: String },
+  usageInstructions: { type: String },
+  rackId: { type: mongoose.Schema.Types.ObjectId, ref: "Rack" },
+  unitPurchasePrice: { type: Number, required: true },
+  unitSellingPrice: { type: Number, required: true }
+}, { timestamps: true });
+
+export default mongoose.models.Medicine || mongoose.model("Medicine", medicineSchema);
+
+medicineBatchSchema
+const medicineBatchSchema = new mongoose.Schema({
+  medicineId: { type: mongoose.Schema.Types.ObjectId, ref: "Medicine", required: true },
+  batchNumber: { type: String },
+  expiryDate: { type: Date, required: true },
+  quantityInStock: { type: Number, required: true },
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: "Vendor", required: true },
+  dateReceived: { type: Date, default: Date.now }
+}, { timestamps: true });
+
+export default mongoose.models.MedicineBatch || mongoose.model("MedicineBatch", medicineBatchSchema);
+
+salesSchema
+const salesSchema = new mongoose.Schema({
+  saleDate: { type: Date, default: Date.now },
+  paymentMode: { type: String, enum: ["Cash", "Card", "UPI", "Cheque"], required: true },
+  totalAmount: { type: Number, required: true }
+}, { timestamps: true });
+
+export default mongoose.models.Sales || mongoose.model("Sales", salesSchema);
+
+salesDetailsSchema
+const salesDetailsSchema = new mongoose.Schema({
+  saleId: { type: mongoose.Schema.Types.ObjectId, ref: "Sales", required: true },
+  batchId: { type: mongoose.Schema.Types.ObjectId, ref: "MedicineBatch", required: true },
+  quantity: { type: Number, required: true },
+  unitPrice: { type: Number, required: true },
+  totalPrice: { type: Number, required: true }
+}, { timestamps: true });
+
+export default mongoose.models.SalesDetails || mongoose.model("SalesDetails", salesDetailsSchema);
+
+purchaseOrderSchema
+const purchaseOrderSchema = new mongoose.Schema({
+  orderDate: { type: Date, default: Date.now },
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: "Vendor", required: true },
+  status: { type: String, enum: ["Pending", "Completed", "Cancelled"], default: "Pending" }
+}, { timestamps: true });
+
+export default mongoose.models.PurchaseOrder || mongoose.model("PurchaseOrder", purchaseOrderSchema);
+
+purchaseOrderDetailsSchema
+const purchaseOrderDetailsSchema = new mongoose.Schema({
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: "PurchaseOrder", required: true },
+  medicineId: { type: mongoose.Schema.Types.ObjectId, ref: "Medicine", required: true },
+  quantityOrdered: { type: Number, required: true }
+}, { timestamps: true });
+
+export default mongoose.models.PurchaseOrderDetails || mongoose.model("PurchaseOrderDetails", purchaseOrderDetailsSchema);
+
+paymentSchema
+const paymentSchema = new mongoose.Schema({
+  vendorId: { type: mongoose.Schema.Types.ObjectId, ref: "Vendor", required: true },
+  paymentDate: { type: Date, default: Date.now },
+  amountPaid: { type: Number, required: true },
+  paymentMode: { type: String, enum: ["Cash", "Cheque", "UPI", "BankTransfer"], required: true }
+}, { timestamps: true });
+
+export default mongoose.models.Payment || mongoose.model("Payment", paymentSchema);
+

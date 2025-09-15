@@ -8,6 +8,6 @@ const ownerSchema = new mongoose.Schema({
   password: { type: String, required: true },
 }, { timestamps: true })
 
-const ownerModel = mongoose.models.User || mongoose.model("Owner", ownerSchema);
+const ownerModel = mongoose.models.Owner || mongoose.model("Owner", ownerSchema);
 
 export default ownerModel
