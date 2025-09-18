@@ -12,12 +12,15 @@ import medicineModel from "./models/medicineModel.js"
 import medicineBatchModel from "./models/medicineBatchModel.js";
 import salesModel from "./models/salesModel.js";
 import salesDetailsModel from "./models/salesDetailsModel.js";
+import vendorModel from "./models/vendorModel.js";
 
 import staffRouter from "./routes/staffRoutes.js";
 import ownerRouter from "./routes/ownerRoutes.js";
 import  medicineRouter  from "./routes/medicineRoutes.js";
 import rackRouter from "./routes/rackRouter.js";
 import salesRouter from "./routes/salesRoutes.js";
+import vendorRouter from "./routes/vendorRoutes.js";
+import batchRouter from "./routes/batchRoutes.js";
 
 const app = express();
 
@@ -33,6 +36,8 @@ app.use('/api/owner',ownerRouter)
 app.use('/api/medicine',medicineRouter)
 app.use('/api/rack',rackRouter)
 app.use('/api/sales',salesRouter)
+app.use('/api/vendor',vendorRouter)
+app.use('/api/batch',batchRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

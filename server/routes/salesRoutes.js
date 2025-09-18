@@ -1,5 +1,5 @@
 import express from 'express' 
-import GenerateReceipt from '../controllers/salesController.js'
+import { GenerateReceipt } from '../controllers/salesController.js'
 
 const salesRouter = express.Router()
 

@@ -1,6 +1,10 @@
 import medicineBatchModel from "../models/medicineBatchModel.js";
 import medicineModel from "../models/medicineModel.js";
 import rackModel from "../models/rackModel.js";
+import salesDetailsModel from "../models/salesDetailsModel.js";
+import thresholdModel from "../models/thresholdModel.js";
+import vendorModel from "../models/vendorModel.js";
+import salesModel from "../models/salesModel.js";
 
 const addMedicine = async (req, res) => {
   try {
@@ -55,6 +59,9 @@ const addMedicine = async (req, res) => {
       unitSellingPrice,
     });
 
+    const thresholdvalue = await thresholdModel.create({
+      medicineId : newMedicine._id,
+    })
     return res.status(201).json({
       success: true,
       message: "Medicine added successfully",
@@ -121,6 +128,14 @@ const deleteMedicine = async (req,res) => {
     if (!deletedMedicine) {
       return res.status(404).json({ success: false,error: "Medicine not found" });
     }
+
+    await vendorModel.updateOne(
+      { medicineCodes: medicineCode },
+      { $pull: { medicineCodes: medicineCode } }
+    );
+
+    const medicine = await medicineModel.find({medicineCode})
+    await thresholdModel.findOneAndDelete({medicineId : medicine._id});
     
     return res.json({success: true , message: "Medicine deleted successfully" });  
 }
@@ -160,4 +175,76 @@ const searchMedicine = async (req,res) => {
         return res.status(500).json({ success: false, error: "Server error" });
     }
 }
-export { addMedicine, viewAllMedicines, ExpiredMedicines,deleteMedicine,searchMedicine };
+const thresholdCalculations = async (req, res) => {
+  try {
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() -1);
+
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(today.getDate() - 7);
+
+    const sales = await salesModel.find({
+      saleDate: { $gte: oneWeekAgo, $lte: yesterday },
+    });
+
+    if (!sales.length) {
+      return res.json({ success: false, message: "There are no sales last week" });
+    }
+
+    const salesIds = sales.map((sale) => sale._id);
+
+    const salesDetails = await salesDetailsModel.find({ saleId: { $in: salesIds } })
+      .populate({
+        path: "batchIds.batchId",
+        populate: {
+          path: "medicineId",
+          model: "Medicine",
+          select: "medicineCode",
+        },
+      });
+
+    const medicineTotals = new Map();
+
+    for (const sale of salesDetails) {
+      for (const batch of sale.batchIds) {
+        if (batch.batchId && batch.batchId.medicineId) {
+          const medicine = batch.batchId.medicineId;
+          const medicineId = medicine._id.toString();
+          const medicineCode = medicine.medicineCode;
+          const qty = batch.quantity;
+
+          if (!medicineTotals.has(medicineId)) {
+
+            medicineTotals.set(medicineId, { medicineId, medicineCode, totalQuantity: qty });
+          } else {
+
+            medicineTotals.get(medicineId).totalQuantity += qty;
+          }
+          
+        }
+      }
+    }
+
+    const medicineId_QuantitySold = Array.from(medicineTotals.values());
+
+    for (const med of medicineId_QuantitySold) {
+      const thresholdValue =  (((med.totalQuantity / 7) * 2) > 200 ) ? (med.totalQuantity / 7) * 2: 200;
+
+      await thresholdModel.findOneAndUpdate(
+        { medicineId: med.medicineId },
+        { thresholdQuantity: thresholdValue },
+        { upsert: true, new: true }
+      );
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Updated the threshold values for each medicine"});
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+
+export { addMedicine, viewAllMedicines, ExpiredMedicines, deleteMedicine, searchMedicine, thresholdCalculations };

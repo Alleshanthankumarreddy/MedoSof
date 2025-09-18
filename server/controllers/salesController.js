@@ -6,7 +6,7 @@ import salesModel from "../models/salesModel.js";
 const GenerateReceipt = async (req, res) => {
   try {
     const { medicineMap, mode } = req.body; 
-    // medicineMap = { "M001": 12, "M002": 7 } 
+    // medicineMap = { "M001": 12,"M002": 7 } 
 
     if (!medicineMap || !mode) {
       return res.status(400).json({ success: false, message: "Missing the Details" });
@@ -96,4 +96,7 @@ const GenerateReceipt = async (req, res) => {
   }
 };
 
-export default GenerateReceipt;
+
+
+
+export { GenerateReceipt };
