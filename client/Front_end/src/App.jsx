@@ -1,33 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useContext, useState } from 'react'
+import React from 'react'
+import { AppContext } from './AppContext';
+import Navbar from './components/Navbar';
+import Login from './components/Login';
+import { Routes,Route} from 'react-router-dom';
+import Home from './components/Home';
+import Medicines from './components/Medicines';
+import Racks from './components/Racks';
+import Vendors from './components/Vendors';
+import Sales from './components/Sales';
+import LowStockMedicines from './components/LowStockMedicines';
+import Purchase from './components/Purchase';
+import ExpiredMedicines from './components/ExpiredMedicines';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const {showLogin} = useContext(AppContext);
+
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Navbar/>
+      {showLogin && <Login/>}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/medicines" element={<Medicines/>}/>
+        <Route path="/racks" element={<Racks/>}/>
+        <Route path="/vendor" element={<Vendors/>}/>
+        <Route path="/sales" element={<Sales/>}/>
+        <Route path="/lowstockmedicines" element={<LowStockMedicines/>}/>
+        <Route path="/purchase" element={<Purchase/>}/>
+        <Route path="/expiredMedicines" element={<ExpiredMedicines/>}/>
+      </Routes>
     </>
   )
 }

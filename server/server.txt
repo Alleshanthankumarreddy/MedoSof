@@ -1,1 +1,0 @@
-This folder contain all the backend patrt of the project.
