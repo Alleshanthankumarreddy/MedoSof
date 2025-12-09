@@ -3,12 +3,13 @@ import axios from "axios";
 import { AppContext } from "../AppContext";
 
 function Purchase() {
-  const { lowStockMedicines, setLowStockMedicines, handleRemoveMedicine } = useContext(AppContext);
+  const { lowStockMedicines, setLowStockMedicines, handleRemoveMedicine, backendUrl  } = useContext(AppContext);
   const [selectedMedicine, setSelectedMedicine] = useState(null);
   const [batchDetails, setBatchDetails] = useState({
     batchCode: "",
     expiryDate: "",
     quantity: "",
+    vendorMail:"",
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -24,6 +25,7 @@ function Purchase() {
       batchCode: "",
       expiryDate: "",
       quantity: "",
+      vendorMail: "",
     });
   };
 
@@ -40,11 +42,11 @@ function Purchase() {
 
       // 1️⃣ Add purchase record
       await axios.post(
-        "http://localhost:4000/api/purchase/addPurchase",
+        `${backendUrl}api/purchase/addPurchase`,
         {
           medicineCode: selectedMedicine.medicineCode,
           quantity: Number(batchDetails.quantity),
-          vendorMail: selectedMedicine.vendorMail,
+          vendorMail: batchDetails.vendorMail,
           shopCode,
           expiryDate: batchDetails.expiryDate,
         },
@@ -53,13 +55,13 @@ function Purchase() {
 
       // 2️⃣ Add batch record
       const res = await axios.post(
-        "http://localhost:4000/api/batch/addBatch",
+        `${backendUrl}api/batch/addBatch`,
         {
           medicineCode: selectedMedicine.medicineCode,
           batchCode: batchDetails.batchCode,
           expiryDate: batchDetails.expiryDate,
           quantity: Number(batchDetails.quantity),
-          vendorMail: selectedMedicine.vendorMail,
+          vendorMail: batchDetails.vendorMail,
           shopCode,
         },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -143,6 +145,13 @@ function Purchase() {
                 name="batchCode"
                 placeholder="Batch Code"
                 value={batchDetails.batchCode}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400"
+              />
+              <input
+                name="vendorMail"
+                placeholder="vendorMail"
+                value={batchDetails.vendorMail}
                 onChange={handleInputChange}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400"
               />

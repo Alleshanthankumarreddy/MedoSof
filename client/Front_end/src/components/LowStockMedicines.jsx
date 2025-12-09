@@ -9,7 +9,7 @@ function LowStockMedicines() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const { lowStockMedicines, setLowStockMedicines } = useContext(AppContext);
+  const { lowStockMedicines, setLowStockMedicines,backendUrl } = useContext(AppContext);
 
   const handleRestock = (medicine) => {
     setLowStockMedicines((prev) => {
@@ -37,7 +37,7 @@ function LowStockMedicines() {
       }
 
       const response = await axios.post(
-        "http://localhost:4000/api/medicine/getLowStockMedicines",
+        `${backendUrl}api/medicine/getLowStockMedicines`,
         { shopCode },
         {
           headers: { Authorization: `Bearer ${token}` },

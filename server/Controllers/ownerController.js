@@ -2,6 +2,8 @@ import bcrypt from "bcrypt";
 import ownerModel from "../Models/ownerModel.js";
 import jwt from "jsonwebtoken";
 
+
+
 const signup = async (req, res) => {
   try {
     const { name, mail, password, shopCode, shopName, shopAddress, numberOfStaff } = req.body;
@@ -39,7 +41,7 @@ const signup = async (req, res) => {
 
     const owner = await newOwner.save();
 
-    const token = jwt.sign({ id: owner._id, mail: owner.mail },"ownerJWTsecret");
+    const token = jwt.sign({ id: owner._id, mail: owner.mail },process.env.OWNER_JWT_SECRET);
 
     return res.status(201).json({
       success: true,
@@ -80,7 +82,7 @@ const signin = async (req,res) => {
           return res.status(401).json({ success: false, message: "Invalid password" });
         }
 
-        const token = jwt.sign({ id: owner._id, mail: owner.mail },"ownerJWTsecret");
+        const token = jwt.sign({ id: owner._id, mail: owner.mail },process.env.OWNER_JWT_SECRET);
 
         return res.status(200).json({
           success: true,

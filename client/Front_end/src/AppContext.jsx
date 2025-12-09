@@ -7,6 +7,8 @@ export const AppProvider = (props) => {
   const [shopCode, setShopCode] = useState(localStorage.getItem("shopCode" || null));
   const [owner, setOwner] = useState(localStorage.getItem("role") === "owner");
   const [staff, setStaff] = useState(localStorage.getItem("role") === "staff");
+  const [vendor, setVendor] = useState(localStorage.getItem("role") === "vendor");
+
   const [user, setUser] = useState(
     localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null
   );
@@ -20,34 +22,27 @@ export const AppProvider = (props) => {
   });
 
   useEffect(() => {
-    localStorage.setItem("lowStockMedicines", JSON.stringify(lowStockMedicines));
-  }, [lowStockMedicines]);
+        localStorage.setItem("lowStockMedicines", JSON.stringify(lowStockMedicines));
+      }, [lowStockMedicines]);
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedShopCode = localStorage.getItem("shopCode");
-    const savedRole = localStorage.getItem("role");
-    const savedUser = localStorage.getItem("user");
-  
-    if (savedToken && savedUser) {
-      setToken(savedToken);
+      useEffect(() => {
+      const savedToken = localStorage.getItem("token");
+      const savedUser = localStorage.getItem("user");
+      const savedRole = localStorage.getItem("role");
+      const savedShopCode = localStorage.getItem("shopCode");
+
+      if (!savedToken || !savedUser) return;
+
+      if (token !== savedToken) setToken(savedToken);
+      if (!user) setUser(JSON.parse(savedUser));
+
+      setOwner(savedRole === "owner");
+      setStaff(savedRole === "staff");
+      setVendor(savedRole === "vendor");
       setShopCode(savedShopCode);
-      setUser(JSON.parse(savedUser));  // ✅ restore user object
-  
-      if (savedRole === "owner") {
-        setOwner(true);
-        setStaff(false);
-      } else if (savedRole === "staff") {
-        setStaff(true);
-        setOwner(false);
-      }
-    } else {
-      setToken(null);
-      setUser(null);
-      setOwner(false);
-      setStaff(false);
-    }
+
   }, [token]);
+
 
   const addMedicine = (medicine) => {
     setListOfMedicines((prev) => {
@@ -107,6 +102,8 @@ export const AppProvider = (props) => {
     setOwner,
     staff,
     setStaff,
+    vendor, 
+    setVendor,
     token,
     setToken,
     backendUrl,

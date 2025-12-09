@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
+import { AppContext } from "../AppContext";
 
 function AddRack({ onSuccess }) {
   const [rackCode, setRackCode] = useState("");
@@ -7,6 +8,8 @@ function AddRack({ onSuccess }) {
   const [position, setPosition] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const {backendUrl} = useContext(AppContext);
 
   const handleAddRack = async (e) => {
     e.preventDefault();
@@ -22,7 +25,7 @@ function AddRack({ onSuccess }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "http://localhost:4000/api/rack/addRack",
+        `${backendUrl}api/rack/addRack`,
         { rackCode, shopCode, position },
         {
           headers: { Authorization: `Bearer ${token}` },

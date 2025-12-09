@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { AppContext } from "../AppContext";
 
 function ExpiredMedicines() {
   const [expiredList, setExpiredList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
+
+  const {backendUrl} = useContext(AppContext);
 
   useEffect(() => {
     fetchExpiredMedicines();
@@ -22,7 +25,7 @@ function ExpiredMedicines() {
       const shopCode = localStorage.getItem("shopCode");
 
       const res = await axios.post(
-        "http://localhost:4000/api/batch/expiredMedicines",
+        `${backendUrl}api/batch/expiredMedicines`,
         { shopCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -55,7 +58,7 @@ function ExpiredMedicines() {
       const shopCode = localStorage.getItem("shopCode");
 
       const res = await axios.delete(
-        "http://localhost:4000/api/batch/removeExpiredMedicines",
+        `${backendUrl}api/batch/removeExpiredMedicines`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { shopCode },

@@ -11,8 +11,7 @@ const medicineSchema = new mongoose.Schema(
     unitSellingPrice: { type: Number, required: true }, 
     medicineName: { type: String, required: true },        
     totalQuantity: { type: Number, required: true },
-    thresholdValue: { type: Number, required: true, default: 50},     
-    vendorMail: { type: String, required: true }           
+    thresholdValue: { type: Number, required: true, default: 50}        
   },
   { timestamps: true } 
 );

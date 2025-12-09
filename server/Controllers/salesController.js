@@ -115,4 +115,36 @@ const addSales = async (req, res) => {
   }
 };
 
-export { addSales };
+const getLastWeekSales = async (req, res) => {
+  try {
+    const shopCode = req.user.shopCode; // from auth middleware
+
+    const today = new Date();
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(23, 59, 59, 999);
+
+    const lastWeekStart = new Date(yesterday);
+    lastWeekStart.setDate(lastWeekStart.getDate() - 6);
+    lastWeekStart.setHours(0, 0, 0, 0);
+
+    const sales = await salesModel.find({
+      shopCode,
+      time: { $gte: lastWeekStart, $lte: yesterday },
+    });
+
+    res.status(200).json({
+      success: true,
+      sales,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching last week's sales",
+    });
+  }
+};
+export { addSales, getLastWeekSales };

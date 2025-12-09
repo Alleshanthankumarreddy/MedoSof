@@ -3,7 +3,7 @@ import axios from "axios";
 import { AppContext } from "../AppContext";
 
 function SalesMedicines() {
-  const { addMedicine, removeMedicine } = useContext(AppContext);
+  const { addMedicine, removeMedicine,backendUrl } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState("");
   const [medicines, setMedicines] = useState([]);
   const [filteredMedicines, setFilteredMedicines] = useState([]);
@@ -13,9 +13,8 @@ function SalesMedicines() {
       const token = localStorage.getItem("token");
       const shopCode = localStorage.getItem("shopCode");
       if (!token || !shopCode) return;
-
       const response = await axios.post(
-        "http://localhost:4000/api/medicine/getAllMedicines",
+        `${backendUrl}api/medicine/getAvailableMedicines`,
         { shopCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );

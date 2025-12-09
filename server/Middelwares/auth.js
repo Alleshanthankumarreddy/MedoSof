@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import staffModel from "../Models/staffModel.js";
 import ownerModel from "../Models/ownerModel.js";
+import vendorModel from "../Models/vendorModel.js";
 
 const auth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -25,6 +26,17 @@ const auth = async (req, res, next) => {
       // Not staff, continue to check owner
     }
 
+    try {
+      const decoded = jwt.verify(token, "vendorJWTsecret");
+      const vendor= await vendorModel.findById(decoded.id);
+      if (!vendor)
+        return res.status(401).json({ success: false, message: "vendor not found" });
+      req.user = vendor;
+      req.role = "vendor";
+      return next();
+    } catch (err) {
+      
+    }
     // Try Owner
     try {
       const decoded = jwt.verify(token, "ownerJWTsecret");
@@ -37,6 +49,7 @@ const auth = async (req, res, next) => {
     } catch (err) {
       return res.status(401).json({ success: false, message: "Invalid token" });
     }
+    
 
   } catch (error) {
     console.error("Auth middleware error:", error);

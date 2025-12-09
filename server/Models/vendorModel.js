@@ -1,11 +1,22 @@
 import mongoose from "mongoose";
- 
-const vendorSchema = new mongoose.Schema({
-    name: {type: String,required: true},
-    mail: {type: String,required: true,unique: true},
-    contactNumber: {type: String,required: true }
-},{ timestamps: true });
 
-const vendorModel = mongoose.models.vendor || mongoose.model('vendor',vendorSchema);
+const vendorSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    mail: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    contactNumber: {type: Number,required: true},
+    medicines: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "medicine", 
+      }
+    ]
+  },
+  { timestamps: true }
+);
 
-export default vendorModel;
+const Vendor =
+  mongoose.models.Vendor || mongoose.model("vendor", vendorSchema);
+
+export default Vendor;

@@ -41,7 +41,7 @@ const signup = async (req, res) => {
 
     const staff = await newStaff.save();
 
-    const token = jwt.sign({ id: staff._id, mail: staff.mail },"staffJWTsecret" );
+    const token = jwt.sign({ id: staff._id, mail: staff.mail },process.env.STAFF_JWT_SECRET );
 
     return res.status(201).json({
       success: true,
@@ -78,7 +78,7 @@ const signin = async (req, res) => {
       return res.status(401).json({ success: false, message: "Invalid password" });
     }
 
-    const token = jwt.sign({ id: staff._id, mail: staff.mail },"staffJWTsecret");
+    const token = jwt.sign({ id: staff._id, mail: staff.mail },process.env.STAFF_JWT_SECRET);
 
     return res.status(200).json({
       success: true,
@@ -97,5 +97,65 @@ const signin = async (req, res) => {
   }
 };
 
+const getAllStaff = async (req, res) => {
+  try {
+    const { shopCode } = req.params;   
+    console.log(shopCode);
+    if (!shopCode) {
+      return res.status(400).json({ message: "shopCode is required" });
+    }
 
-export { signup,signin };
+    const staff = await staffModel.find({ shopCode });
+
+    return res.status(200).json({
+      success: true,
+      count: staff.length,
+      staff
+    });
+
+  } catch (error) {
+    console.error("Error fetching staff:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+const removeStaff = async (req, res) => {
+  try {
+    const { shopCode, mail } = req.body;
+
+    if (!shopCode || !mail) {
+      return res.status(400).json({
+        success: false,
+        message: "shopCode and mail are required"
+      });
+    }
+
+    const deletedStaff = await staffModel.findOneAndDelete({
+      shopCode: shopCode,
+      mail: mail
+    });
+
+    if (!deletedStaff) {
+      return res.status(404).json({
+        success: false,
+        message: "No staff found with this mail under this shop"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Staff removed successfully",
+      deletedStaff
+    });
+
+  } catch (error) {
+    console.error("Error removing staff:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error"
+    });
+  }
+};
+
+export { signup,signin,getAllStaff,removeStaff };

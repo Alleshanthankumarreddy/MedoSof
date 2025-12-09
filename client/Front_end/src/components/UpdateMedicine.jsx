@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
+import { AppContext } from "../AppContext";
 
 function UpdateMedicine({ medicine, onClose, onUpdateSuccess }) {
   const [selectedOption, setSelectedOption] = useState("rack");
@@ -8,6 +9,7 @@ function UpdateMedicine({ medicine, onClose, onUpdateSuccess }) {
   const [message, setMessage] = useState("");
 
   const shopCode = localStorage.getItem("shopCode");
+  const {backendUrl} = useContext(AppContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,13 +26,13 @@ function UpdateMedicine({ medicine, onClose, onUpdateSuccess }) {
 
       // Choose API endpoint and payload based on selected option
       if (selectedOption === "rack") {
-        url = "http://localhost:4000/api/medicine/updateRackCode";
+        url = `${backendUrl}api/medicine/updateRackCode`;
         payload.newRackCode = inputValue;
       } else if (selectedOption === "sellingPrice") {
-        url = "http://localhost:4000/api/medicine/updateUnitSellingPrice";
+        url = `${backendUrl}api/medicine/updateUnitSellingPrice`;
         payload.newUnitSellingPrice = Number(inputValue);
       } else if (selectedOption === "costPrice") {
-        url = "http://localhost:4000/api/medicine/updateUnitCostPrice";
+        url = `${backendUrl}api/medicine/updateUnitCostPrice`;
         payload.newUnitCostPrice = Number(inputValue);
       }
 

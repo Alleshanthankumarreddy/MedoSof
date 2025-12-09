@@ -1,10 +1,14 @@
 // DeleteMedicine.jsx
 import React, { useState } from "react";
 import axios from "axios";
+import { AppContext } from "../AppContext";
+import { useContext } from "react";
 
 function DeleteMedicine({ medicine, onClose, onDeleteSuccess }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const {backendUrl} = useContext(AppContext);
 
   const shopCode = localStorage.getItem("shopCode");
   const token = localStorage.getItem("token");
@@ -18,7 +22,7 @@ function DeleteMedicine({ medicine, onClose, onDeleteSuccess }) {
     try {
       setLoading(true);
       const response = await axios.delete(
-        "http://localhost:4000/api/medicine/deleteMedicine",
+        `${backendUrl}api/medicine/deleteMedicine`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { shopCode, medicineCode: medicine.medicineCode },

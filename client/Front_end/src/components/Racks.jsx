@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import AddRack from "./AddRack";
 import DeleteRack from "./DeleteRack";
+import { AppContext } from "../AppContext";
 
 function RackList() {
   const [racks, setRacks] = useState([]);
@@ -10,6 +11,8 @@ function RackList() {
   const [showAddRack, setShowAddRack] = useState(false);
   const [showDeleteRack, setShowDeleteRack] = useState(false);
   const [selectedRack, setSelectedRack] = useState(null);
+
+  const {backendUrl} = useContext(AppContext);
 
   const fetchRacks = async () => {
     try {
@@ -26,7 +29,7 @@ function RackList() {
 
       // ✅ Since GET requests can’t have a body, send shopCode as a query param
       const response = await axios.post(
-        "http://localhost:4000/api/rack/showAllRacks",
+        `${backendUrl}api/rack/showAllRacks`,
         {shopCode},
         {
             headers: { Authorization: `Bearer ${token}` },

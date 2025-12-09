@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
+import { AppContext } from "../AppContext";
 
 function DeleteRack({ rack, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const { backendUrl} = useContext(AppContext)
 
   if (!rack) return null;
 
@@ -15,7 +18,7 @@ function DeleteRack({ rack, onClose, onSuccess }) {
       const token = localStorage.getItem("token");
       const shopCode = localStorage.getItem("shopCode");
 
-      const response = await axios.delete("http://localhost:4000/api/rack/deleteRack", {
+      const response = await axios.delete(`${backendUrl}api/rack/deleteRack`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { rackCode: rack.rackCode, shopCode },
       });

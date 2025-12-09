@@ -3,6 +3,7 @@ import ownerModel from "../Models/ownerModel.js";
 import rackModel from "../Models/rackModel.js";
 import vendorModel from "../Models/vendorModel.js";
 import salesModel from "../Models/salesModel.js";
+import batchModel from "../Models/batchModel.js"
 
 const addMedicine = async (req, res) => {
   try {
@@ -14,10 +15,7 @@ const addMedicine = async (req, res) => {
       rackCode,
       unitCostPrice,
       unitSellingPrice,
-      medicineName,
-      totalQuantity,
-      thresholdValue,
-      vendorMail
+      medicineName
     } = req.body;
 
     if (
@@ -28,10 +26,7 @@ const addMedicine = async (req, res) => {
       !rackCode ||
       !unitCostPrice ||
       !unitSellingPrice ||
-      !medicineName ||
-      !totalQuantity ||
-      !thresholdValue ||
-      !vendorMail
+      !medicineName 
     ) {
       return res.status(400).json({ success: false, message: "Missing Credentails" });
     }
@@ -40,12 +35,6 @@ const addMedicine = async (req, res) => {
 
     if(!validshopCode) {
         return res.status(400).json({success: false,message: "Check the shop code once,shop code does not exists"});
-    }
-
-    const vaildVendorMail = await vendorModel.findOne({mail: vendorMail})
-
-    if(!vaildVendorMail) {
-        return res.status(400).json({success: false,message: "Check the vendor mail once,mail does not exists"});       
     }
 
     const validRackCode = await rackModel.findOne({ shopCode, rackCode });
@@ -75,9 +64,8 @@ const addMedicine = async (req, res) => {
       unitCostPrice,
       unitSellingPrice,
       medicineName,
-      totalQuantity,
-      thresholdValue,
-      vendorMail
+      totalQuantity : 0,
+      thresholdValue : 50,
     });
 
     return res.status(201).json({success: true,message: "Medicine added successfully",data: newMedicine});
@@ -316,7 +304,6 @@ const showAllMedicines = async (req, res) => {
         });
       }
   
-      // ✅ Check if the shop exists in ownerModel
       const shopExists = await ownerModel.findOne({ shopCode });
   
       if (!shopExists) {
@@ -326,7 +313,7 @@ const showAllMedicines = async (req, res) => {
         });
       }
   
-      // ✅ Fetch all medicines belonging to that shop
+     
       const medicines = await medicineModel.find({ shopCode });
   
       if (!medicines || medicines.length === 0) {
@@ -335,8 +322,7 @@ const showAllMedicines = async (req, res) => {
           message: "No medicines found for this shop.",
         });
       }
-  
-      // ✅ Success response
+
       return res.status(200).json({
         success: true,
         medicines,
@@ -350,6 +336,51 @@ const showAllMedicines = async (req, res) => {
       });
     }
   };
-  
 
-export { addMedicine, showAllMedicines, calculateThreshold, deleteMedicine, updateRackCode, updateUnitSellingPrice,  updateUnitCostPrice, getLowStockMedicines};
+const getAvailableMedicines = async (req, res) => {
+  try {
+    const { shopCode } = req.body;
+
+    if (!shopCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Shop code is required",
+      });
+    }
+
+    const shopExists = await ownerModel.findOne({ shopCode });
+
+    if (!shopExists) {
+      return res.status(404).json({
+        success: false,
+        message: "Shop not found. Invalid shop code.",
+      });
+    }
+
+
+    const medicines = await medicineModel.find({
+      shopCode,
+      totalQuantity: { $gt: 0 },
+    });
+
+
+    return res.status(200).json({
+      success: true,
+      count: medicines.length,
+      medicines,
+    });
+
+
+  } catch (error) {
+    console.error("Error fetching available medicines:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while fetching available medicines",
+      error: error.message,
+    });
+  }
+};
+
+  
+  
+export { getAvailableMedicines, addMedicine, showAllMedicines, calculateThreshold, deleteMedicine, updateRackCode, updateUnitSellingPrice,  updateUnitCostPrice, getLowStockMedicines};

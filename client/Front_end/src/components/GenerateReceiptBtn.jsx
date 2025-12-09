@@ -3,7 +3,7 @@ import axios from "axios";
 import { AppContext } from "../AppContext";
 
 function GenerateReceiptBtn() {
-  const { listOfMedicines, setListOfMedicines } = useContext(AppContext);
+  const { listOfMedicines, setListOfMedicines,backendUrl } = useContext(AppContext);
 
   const [paymentMode, setPaymentMode] = useState("Cash");
   const [customerName, setCustomerName] = useState("");
@@ -25,7 +25,7 @@ function GenerateReceiptBtn() {
       const shopCode = localStorage.getItem("shopCode");
 
       const response = await axios.post(
-        "http://localhost:4000/api/sales/addSales",
+        `${backendUrl}api/sales/addSales`,
         {
           shopCode,
           listOfMedicines: listOfMedicines.map((m) => ({

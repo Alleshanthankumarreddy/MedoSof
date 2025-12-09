@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
+import { AppContext } from "../AppContext";
 
 function AddMedicine({ onMedicineAdded }) {
   const [showForm, setShowForm] = useState(false);
@@ -11,19 +12,19 @@ function AddMedicine({ onMedicineAdded }) {
     rackCode: "",
     unitCostPrice: "",
     unitSellingPrice: "",
-    medicineName: "",
-    totalQuantity: "",
-    thresholdValue: "",
-    vendorMail: "",
+    medicineName: ""
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  const {backendUrl} = useContext(AppContext);
+
   // 🔹 Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
 
   // 🔹 Handle form submission
   const handleSubmit = async (e) => {
@@ -35,7 +36,7 @@ function AddMedicine({ onMedicineAdded }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "http://localhost:4000/api/medicine/addMedicine",
+        `${backendUrl}api/medicine/addMedicine`,
         formData,
         {
           headers: {
@@ -58,10 +59,7 @@ function AddMedicine({ onMedicineAdded }) {
           rackCode: "",
           unitCostPrice: "",
           unitSellingPrice: "",
-          medicineName: "",
-          totalQuantity: "",
-          thresholdValue: "",
-          vendorMail: "",
+          medicineName: ""
         });
 
         if (onMedicineAdded) onMedicineAdded(); // refresh list in parent
@@ -112,10 +110,7 @@ function AddMedicine({ onMedicineAdded }) {
                 "rackCode",
                 "unitCostPrice",
                 "unitSellingPrice",
-                "medicineName",
-                "totalQuantity",
-                "thresholdValue",
-                "vendorMail",
+                "medicineName"
             ].map((field) => (
                 <div
                 key={field}
@@ -135,7 +130,7 @@ function AddMedicine({ onMedicineAdded }) {
                 <input
                   id={field}
                   type={
-                    ["unitCostPrice", "unitSellingPrice", "totalQuantity", "thresholdValue"].includes(field)
+                    ["unitCostPrice", "unitSellingPrice"].includes(field)
                       ? "number"
                       : "text"
                   }

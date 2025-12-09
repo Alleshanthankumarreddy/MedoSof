@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import AddMedicine from "./AddMedicine";
 import UpdateMedicine from "./UpdateMedicine";
 import DeleteMedicine from "./DeleteMedicine"; 
+import { AppContext } from "../AppContext";
 
 
 function Medicines() {
@@ -12,6 +13,8 @@ function Medicines() {
   const [selectedMedicine, setSelectedMedicine] = useState(null); // for modal
   const [updatingMedicine, setUpdatingMedicine] = useState(null);
   const [deletingMedicine, setDeletingMedicine] = useState(null);
+
+  const {backendUrl} = useContext(AppContext);
 
 
   // Fetch medicines
@@ -23,7 +26,7 @@ function Medicines() {
       if (!token || !shopCode) return;
 
       const response = await axios.post(
-        "http://localhost:4000/api/medicine/getAllMedicines",
+        `${backendUrl}api/medicine/getAllMedicines`,
         { shopCode },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -183,7 +186,6 @@ function Medicines() {
               <p><span className="font-semibold">Unit Selling Price:</span> ₹{selectedMedicine.unitSellingPrice}</p>
               <p><span className="font-semibold">Total Quantity:</span> {selectedMedicine.totalQuantity}</p>
               <p><span className="font-semibold">Threshold Value:</span> {selectedMedicine.thresholdValue}</p>
-              <p><span className="font-semibold">Vendor Email:</span> {selectedMedicine.vendorMail}</p>
             </div>
           </div>
         </div>
