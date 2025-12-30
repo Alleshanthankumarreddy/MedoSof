@@ -22,6 +22,7 @@ import medicineRouter from './Routes/medicineRoutes.js';
 import salesRouter from './Routes/salesRoutes.js';
 import purchaseRouter from './Routes/purchaseRoutes.js';
 import batchRouter from './Routes/batchRoutes.js';
+import auth from './Middelwares/auth.js';
 
 dotenv.config();
 

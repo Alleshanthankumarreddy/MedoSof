@@ -3,7 +3,7 @@ import { AppContext } from "../AppContext";
 import axios from "axios";
 
 const StaffList = () => {
-  const { owner, token, shopCode, backendUrl } = useContext(AppContext);
+  const { owner, token, shopCode, backendUrl ,role} = useContext(AppContext);
   const [staffList, setStaffList] = useState([]);
 
   useEffect(() => {
@@ -36,6 +36,7 @@ const StaffList = () => {
       const res = await axios.delete(`${backendUrl}api/staff/removeStaff`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "x-user-role": role
         },
         data: {
           mail,

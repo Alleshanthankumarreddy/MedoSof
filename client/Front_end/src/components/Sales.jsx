@@ -7,11 +7,11 @@ function Sales() {
   const [selectedMedicines, setSelectedMedicines] = useState([]);
 
   return (
-    <>
+    <div className="bg-white">
     <SalesMedicines/>
     <ReceiptMedicines/>
     <GenerateReceiptBtn/>
-    </>
+    </div>
   );
 }
 

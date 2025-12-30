@@ -6,7 +6,7 @@ function DeleteRack({ rack, onClose, onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { backendUrl} = useContext(AppContext)
+  const { backendUrl,role} = useContext(AppContext)
 
   if (!rack) return null;
 
@@ -19,7 +19,10 @@ function DeleteRack({ rack, onClose, onSuccess }) {
       const shopCode = localStorage.getItem("shopCode");
 
       const response = await axios.delete(`${backendUrl}api/rack/deleteRack`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "x-user-role": role 
+        },
         data: { rackCode: rack.rackCode, shopCode },
       });
 

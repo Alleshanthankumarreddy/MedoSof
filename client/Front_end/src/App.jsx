@@ -14,7 +14,8 @@ import Purchase from './components/Purchase';
 import ExpiredMedicines from './components/ExpiredMedicines';
 import StaffList from './components/StaffList';
 import VendorMedicines from './components/VendorMedicines';
-import DisplayProfits from './components/DisplayProfits'
+import DisplayProfits from './components/DisplayProfits';
+import Footer from './components/Footer'
 
 function App() {
   const { showLogin, owner,vendor } = useContext(AppContext);

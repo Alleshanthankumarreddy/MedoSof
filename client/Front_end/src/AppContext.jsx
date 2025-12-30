@@ -1,50 +1,105 @@
-import React, { createContext, useState } from "react";
-import { useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 
 export const AppContext = createContext();
 
-export const AppProvider = (props) => {
-  const [shopCode, setShopCode] = useState(localStorage.getItem("shopCode" || null));
-  const [owner, setOwner] = useState(localStorage.getItem("role") === "owner");
-  const [staff, setStaff] = useState(localStorage.getItem("role") === "staff");
-  const [vendor, setVendor] = useState(localStorage.getItem("role") === "vendor");
-
+export const AppProvider = ({ children }) => {
+  // -----------------------------
+  // Authentication / User Info
+  // -----------------------------
   const [user, setUser] = useState(
-    localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null
+    localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null
   );
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [role, setRole] = useState(localStorage.getItem("role"));
+  const [shopCode, setShopCode] = useState(localStorage.getItem("shopCode"));
+
+  const [owner, setOwner] = useState(role === "owner");
+  const [staff, setStaff] = useState(role === "staff");
+  const [vendor, setVendor] = useState(role === "vendor");
   const [showLogin, setShowLogin] = useState(false);
+
+const [listOfMedicines, setListOfMedicines] = useState(() => {
+  const saved = localStorage.getItem("listOfMedicines");
+
+  if (!saved) return [];
+
+  try {
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+});
+
+
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const [token, setToken] = useState(localStorage.getItem("token" || null));
-  const [listOfMedicines, setListOfMedicines] = useState([]);
+
+  // -----------------------------
+  // Low Stock Medicines
+  // -----------------------------
   const [lowStockMedicines, setLowStockMedicines] = useState(() => {
     const saved = localStorage.getItem("lowStockMedicines");
     return saved ? JSON.parse(saved) : [];
   });
 
+  // -----------------------------
+  // Effects
+  // -----------------------------
   useEffect(() => {
-        localStorage.setItem("lowStockMedicines", JSON.stringify(lowStockMedicines));
-      }, [lowStockMedicines]);
+    if (token) localStorage.setItem("token", token);
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    if (role) localStorage.setItem("role", role);
+    if (shopCode) localStorage.setItem("shopCode", shopCode);
+    
+  }, [token, user, role, shopCode]);
 
-      useEffect(() => {
-      const savedToken = localStorage.getItem("token");
-      const savedUser = localStorage.getItem("user");
-      const savedRole = localStorage.getItem("role");
-      const savedShopCode = localStorage.getItem("shopCode");
+  useEffect(() => {
+    localStorage.setItem(
+      "lowStockMedicines",
+      JSON.stringify(lowStockMedicines)
+    );
+    console.log(lowStockMedicines)
+  }, [lowStockMedicines]);
 
-      if (!savedToken || !savedUser) return;
-
-      if (token !== savedToken) setToken(savedToken);
-      if (!user) setUser(JSON.parse(savedUser));
-
-      setOwner(savedRole === "owner");
-      setStaff(savedRole === "staff");
-      setVendor(savedRole === "vendor");
-      setShopCode(savedShopCode);
-
-  }, [token]);
+useEffect(() => {
+  localStorage.setItem(
+    "listOfMedicines",
+    JSON.stringify(listOfMedicines)
+  );
+}, [listOfMedicines]);
 
 
-  const addMedicine = (medicine) => {
+
+  useEffect(() => {
+    setOwner(role === "owner");
+    setStaff(role === "staff");
+    setVendor(role === "vendor");
+  }, [role]);
+
+  // -----------------------------
+  // Low Stock Functions
+  // -----------------------------
+
+
+
+  const moveToPurchase = (medicine) => {
+    setLowStockMedicines((prev) =>
+      prev.filter((m) => m.medicineCode !== medicine.medicineCode)
+    );
+  };
+  const restoreToLowStock = (medicine) => {
+    setLowStockMedicines((prev) => {
+      const exists = prev.some(
+        (m) => m.medicineCode === medicine.medicineCode
+      );
+      if (exists) return prev;
+      return [...prev, medicine];
+    });
+  };
+ const addMedicine = (medicine) => {
     setListOfMedicines((prev) => {
       const existing = prev.find((m) => m._id === medicine._id);
       if (existing) {
@@ -72,7 +127,8 @@ export const AppProvider = (props) => {
     });
   };
 
-  const updateMedicineQuantity = (medicineId, quantity) => {
+
+const updateMedicineQuantity = (medicineId, quantity) => {
     setListOfMedicines((prev) =>
       prev.map((m) =>
         m._id === medicineId ? { ...m, quantity: quantity } : m
@@ -89,38 +145,42 @@ export const AppProvider = (props) => {
       (item) => item.medicineCode !== medicineCode
     ));
   };
-  
 
+  // -----------------------------
+  // Context Value
+  // -----------------------------
   const value = {
     user,
     setUser,
-    shopCode,
-    setShopCode,
-    showLogin,
-    setShowLogin,
+    token,
+    setToken,
+    role,
+    setRole,
     owner,
     setOwner,
     staff,
     setStaff,
-    vendor, 
-    setVendor,
-    token,
-    setToken,
-    backendUrl,
-    listOfMedicines,
-    setListOfMedicines,
-    addMedicine,
     removeMedicine,
+    vendor,
+    setVendor,
+    shopCode,
+    setShopCode,
+    backendUrl,
+    lowStockMedicines,
+    addMedicine,
+    setLowStockMedicines,
     updateMedicineQuantity,
     removeFromReceipt,
-    lowStockMedicines,
-    setLowStockMedicines,
-    handleRemoveMedicine
+    handleRemoveMedicine,
+    moveToPurchase,
+    restoreToLowStock,
+    showLogin,
+    setShowLogin,
+    listOfMedicines,
+    setListOfMedicines
   };
 
   return (
-    <AppContext.Provider value={value}>
-      {props.children}
-    </AppContext.Provider>
+    <AppContext.Provider value={value}>{children}</AppContext.Provider>
   );
 };

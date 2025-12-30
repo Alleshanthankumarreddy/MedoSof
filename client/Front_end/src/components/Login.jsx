@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import axios from "axios";
 import { AppContext } from "../AppContext";
 import { useNavigate } from "react-router-dom";
+import { UserCog, User, Truck } from "lucide-react";
+
 
 function Login() {
   const {
@@ -11,7 +13,9 @@ function Login() {
     user, setUser,
     token, setToken,
     shopCode, setShopCode,
-    showLogin, setShowLogin
+    showLogin, setShowLogin,
+    backendUrl,role,
+    setRole
   } = useContext(AppContext);
 
   const [person, setPerson] = useState("owner"); 
@@ -19,7 +23,6 @@ function Login() {
   const [formData, setFormData] = useState({});
   const navigate = useNavigate();
 
-  const {backendUrl} = useContext(AppContext);
 
 
   const handleChange = (e) => {
@@ -30,194 +33,324 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const baseURL = `${backendUrl}`;
-      const endpoint = `${baseURL}api/${person}/${state.toLowerCase()}`;
+      const endpoint = `${backendUrl}api/${person}/${state.toLowerCase()}`;
       const response = await axios.post(endpoint, formData);
       const data = response.data;
 
-      if (data.success) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("role", person);
-
-        
-        if (person === "owner" || person === "staff") {
-          const sc = person === "owner" ? data.owner.shopCode : data.staff.shopCode;
-          localStorage.setItem("shopCode", sc);
-          setShopCode(sc);
-        }
-
-        
-        localStorage.setItem("user", JSON.stringify(data.owner || data.staff || data.vendor));
-
-        setToken(data.token);
-
-        setOwner(person === "owner");
-        setStaff(person === "staff");
-        setVendor(person === "vendor");
-
-        setUser(data.owner || data.staff );
-
-        setShowLogin(false);
-      } else {
-        alert(data.message || "Something went wrong");
+      if (!data.success) {
+        alert(data.message || "Login failed");
+        return;
       }
+
+      // persist
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", person);
+
+      setToken(data.token);
+      setRole(person); // ✅ THIS LINE WAS MISSING
+
+      // shopCode
+      if (person === "owner" || person === "staff") {
+        const sc =
+          person === "owner"
+            ? data.owner.shopCode
+            : data.staff.shopCode;
+
+        localStorage.setItem("shopCode", sc);
+        setShopCode(sc);
+      }
+
+      // ✅ user fix
+      const loggedUser = data.owner || data.staff || data.vendor;
+      localStorage.setItem("user", JSON.stringify(loggedUser));
+      setUser(loggedUser);
+
+      // roles
+      setOwner(person === "owner");
+      setStaff(person === "staff");
+      setVendor(person === "vendor");
+
+      setShowLogin(false);
     } catch (error) {
+      console.error(error);
       alert(error.response?.data?.message || "Server error");
     }
   };
 
-  return (
-    <>
-      {state && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999]">
-          <div className="bg-white shadow-lg rounded-2xl p-5 sm:p-6 w-[90%] max-w-[350px] mx-auto max-h-[85vh] overflow-y-auto scale-95">
-            <button
-              onClick={() => setShowLogin(false)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl"
-            >
-              ✕
-            </button>
 
-            <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">
-              {state === "Signup" ? "Signup" : "Signin"}
+return (
+  <>
+    {showLogin && (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-[9999] p-4 animate-fadeIn">
+        <div className="bg-gradient-to-br from-white via-gray-50 to-white rounded-3xl shadow-2xl p-8 w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto relative animate-scaleIn">
+          
+          {/* Close Button */}
+          <button
+            onClick={() => setShowLogin(false)}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 hover:bg-gray-100 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200"
+          >
+            ✕
+          </button>
+
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-[#0C2C47] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div className="text-white text-2xl font-bold">
+                {state === "Signup" ? "👋" : "🔑"}
+              </div>
+            </div>
+            
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              {state === "Signup" ? "Create Account" : "Welcome Back"}
             </h2>
-
-            
-            <div className="mt-6 flex justify-center items-center gap-6">
-              
-              
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="role"
-                  value="owner"
-                  checked={person === "owner"}
-                  onChange={(e) => setPerson(e.target.value)}
-                />
-                <span className="font-medium">Owner</span>
-              </label>
-
-              {/* Staff */}
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="role"
-                  value="staff"
-                  checked={person === "staff"}
-                  onChange={(e) => setPerson(e.target.value)}
-                />
-                <span className="font-medium">Staff</span>
-              </label>
-
-              
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="role"
-                  value="vendor"
-                  checked={person === "vendor"}
-                  onChange={(e) => setPerson(e.target.value)}
-                />
-                <span className="font-medium">Vendor</span>
-              </label>
-
-            </div>
-
-            
-            <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
-              
-              
-              {state === "Signup" && (
-                <>
-                  <Input label="Name" name="name" type="text" handleChange={handleChange} />
-                  <Input label="Mail" name="mail" type="email" handleChange={handleChange} />
-                  <Input label="Password" name="password" type="password" handleChange={handleChange} />
-
-                  
-                  {person === "owner" && (
-                    <>
-                      <Input label="Shop Code" name="shopCode" type="text" handleChange={handleChange} />
-                      <Input label="Shop Name" name="shopName" type="text" handleChange={handleChange} />
-                      <Input label="Shop Address" name="shopAddress" type="text" handleChange={handleChange} />
-                      <Input label="Number of Staff" name="numberOfStaff" type="number" handleChange={handleChange} />
-                    </>
-                  )}
-
-                  {person === "vendor" && (
-                    <Input label="Contact Number" name="contactNumber" type="number" handleChange={handleChange} />
-                  )}
-                  {person === "staff" && (
-                    <Input label="Shop Code" name="shopCode" type="text" handleChange={handleChange} />
-                  )}
-
-                  
-                </>
-              )}
-
-              
-              {state === "Signin" && (
-                <>
-                  <Input label="Mail" name="mail" type="email" handleChange={handleChange} />
-                  <Input label="Password" name="password" type="password" handleChange={handleChange} />
-
-                  {person === "staff" && (
-                    <Input label="Shop Code" name="shopCode" type="text" handleChange={handleChange} />
-                  )}
-
-                 
-                </>
-              )}
-
-              <button
-                type="submit"
-                className="w-full text-black py-2 bg-blue-700 rounded-lg font-semibold hover:bg-blue-800 transition duration-300"
-              >
-                {state === "Signup" ? "Signup" : "Signin"}
-              </button>
-            </form>
-
-            
-            <div className="mt-4 text-center text-sm text-gray-600">
-              {state === "Signup" ? (
-                <>
-                  Already have an account?
-                  <button
-                    onClick={() => setState("Signin")}
-                    className="text-blue-600 font-semibold hover:underline"
-                  >
-                    Signin
-                  </button>
-                </>
-              ) : (
-                <>
-                  Don’t have an account?
-                  <button
-                    onClick={() => setState("Signup")}
-                    className="text-blue-600 font-semibold hover:underline"
-                  >
-                    Signup
-                  </button>
-                </>
-              )}
-            </div>
+            <p className="text-gray-500 text-sm">
+              {state === "Signup" 
+                ? "Join MedoSof and transform your pharmacy management" 
+                : "Sign in to access your pharmacy dashboard"}
+            </p>
           </div>
+
+          {/* Role Selection */}
+          <div className="mb-8">
+  <p className="text-lg font-medium text-gray-700 mb-3 text-center">I am a</p>
+
+  <div className="grid grid-cols-3 gap-2">
+    {[
+      { value: "owner", label: "Owner", Icon: UserCog },
+      { value: "staff", label: "Staff", Icon: User },
+      { value: "vendor", label: "Vendor", Icon: Truck }
+    ].map(({ value, label, Icon }) => (
+      <button
+        key={value}
+        type="button"
+        onClick={() => setPerson(value)}
+        className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-300 ${
+          person === value
+            ? "border-[#0C2C47] bg-[#0C2C47]/10 shadow-sm"
+            : "border-[#0C2C47]-200 hover:border-[#0C2C47]-300 hover:[#0C2C47]-50"
+        }`}
+      >
+        <Icon
+          className={`w-7 h-7 mb-2 ${
+            person === value ? "text-[#0C2C47]" : "text-gray-600"
+          }`}
+        />
+
+        <span
+          className={`text-sm font-medium ${
+            person === value ? "text-[#0C2C47]" : "text-gray-700"
+          }`}
+        >
+          {label}
+        </span>
+
+        {person === value && (
+          <div className="w-2 h-2 bg-[#0C2C47] rounded-full mt-2"></div>
+        )}
+      </button>
+    ))}
+  </div>
+</div>
+
+
+          {/* Form */}
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            
+            {/* Signup Fields */}
+            {state === "Signup" && (
+              <>
+                <Input 
+                  label="Full Name" 
+                  name="name" 
+                  type="text" 
+                  handleChange={handleChange}
+                  icon="👤"
+                  placeholder="John Doe"
+                />
+                <Input 
+                  label="Email Address" 
+                  name="mail" 
+                  type="email" 
+                  handleChange={handleChange}
+                  icon="📧"
+                  placeholder="john@example.com"
+                />
+                <Input 
+                  label="Password" 
+                  name="password" 
+                  type="password" 
+                  handleChange={handleChange}
+                  icon="🔒"
+                  placeholder="••••••••"
+                />
+
+                {/* Owner Specific */}
+                {person === "owner" && (
+                  <div className="space-y-4 pt-4 border-t border-gray-100">
+                    <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="text-blue-500">🏪</span> Pharmacy Details
+                    </h4>
+                    <Input label="Shop Code" name="shopCode" type="text" handleChange={handleChange} placeholder="PH-001" />
+                    <Input label="Shop Name" name="shopName" type="text" handleChange={handleChange} placeholder="MediCare Pharmacy" />
+                    <Input label="Shop Address" name="shopAddress" type="text" handleChange={handleChange} placeholder="123 Medical Street" />
+                    <Input label="Number of Staff" name="numberOfStaff" type="number" handleChange={handleChange} placeholder="5" />
+                  </div>
+                )}
+
+                {/* Vendor Specific */}
+                {person === "vendor" && (
+                  <div className="pt-4 border-t border-gray-100">
+                    <Input 
+                      label="Contact Number" 
+                      name="contactNumber" 
+                      type="tel" 
+                      handleChange={handleChange}
+                      icon="📞"
+                      placeholder="+1 234 567 8900"
+                    />
+                  </div>
+                )}
+
+                {/* Staff Specific */}
+                {person === "staff" && (
+                  <div className="pt-4 border-t border-gray-100">
+                    <Input 
+                      label="Shop Code" 
+                      name="shopCode" 
+                      type="text" 
+                      handleChange={handleChange}
+                      icon="🏪"
+                      placeholder="Enter shop code"
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Signin Fields */}
+            {state === "Signin" && (
+              <>
+                <Input 
+                  label="Email Address" 
+                  name="mail" 
+                  type="email" 
+                  handleChange={handleChange}
+                  icon="📧"
+                  placeholder="john@example.com"
+                />
+                <Input 
+                  label="Password" 
+                  name="password" 
+                  type="password" 
+                  handleChange={handleChange}
+                  icon="🔒"
+                  placeholder="••••••••"
+                />
+
+                {/* Staff Specific */}
+                {person === "staff" && (
+                  <Input 
+                    label="Shop Code" 
+                    name="shopCode" 
+                    type="text" 
+                    handleChange={handleChange}
+                    icon="🏪"
+                    placeholder="Enter shop code"
+                  />
+                )}
+
+                {/* Forgot Password */}
+                <div className="text-right">
+                  <button
+                    type="button"
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* Submit Button - ONLY THIS in navy color */}
+            <button
+              type="submit"
+              className="w-full py-3 bg-[#0C2C47] text-white font-semibold rounded-xl hover:bg-[#0A243A] hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] mt-4"
+            >
+              <span className="flex items-center justify-center gap-2">
+                {state === "Signup" ? (
+                  <>
+                    <span>Create Account</span>
+                    <span className="text-lg">→</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <span className="text-lg">🔓</span>
+                  </>
+                )}
+              </span>
+            </button>
+          </form>
+
+          {/* Toggle between Signup/Signin */}
+          <div className="mt-8 pt-6 pb-8 border-t border-gray-100 text-center">
+  <p className="text-gray-600 text-sm">
+    {state === "Signup" ? "Already have an account?" : "Don't have an account?"}
+
+    <button
+      type="button"
+      onClick={() => setState(state === "Signup" ? "Signin" : "Signup")}
+      className="
+        ml-2 font-semibold
+        text-[#0C2C47]
+        hover:underline
+        transition-colors
+        outline-none
+        focus:outline-none
+        focus:ring-0
+      "
+    >
+      {state === "Signup" ? "Sign In" : "Create Account"}
+    </button>
+  </p>
+</div>
+
+
+          {/* Terms */}
+          {state === "Signup" && (
+            <p className="mt-6 text-xs text-center text-gray-400">
+              By creating an account, you agree to our 
+              <button className="text-blue-500 hover:underline ml-1">Terms</button> and 
+              <button className="text-blue-500 hover:underline ml-1">Privacy Policy</button>
+            </p>
+          )}
         </div>
-      )}
-    </>
-  );
+      </div>
+    )}
+  </>
+);
+
 }
 
-const Input = ({ label, name, type, handleChange }) => (
-  <div>
-    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-    <input
-      type={type}
-      name={name}
-      required
-      onChange={handleChange}
-      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-    />
+const Input = ({ label, name, type, handleChange, icon, placeholder }) => (
+  <div className="group">
+    <label className="block text-sm font-medium text-gray-700 mb-2 ml-1">
+      {icon && <span className="mr-2">{icon}</span>}
+      {label}
+    </label>
+    <div className="relative">
+      <input
+        type={type}
+        name={name}
+        required
+        onChange={handleChange}
+        placeholder={placeholder}
+        className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all duration-300 placeholder-gray-400 hover:border-gray-400"
+      />
+      <div className="absolute inset-0 border-2 border-blue-500 rounded-xl opacity-0 group-focus-within:opacity-100 pointer-events-none transition-opacity duration-300"></div>
+    </div>
   </div>
 );
+
 
 export default Login;

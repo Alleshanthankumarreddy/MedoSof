@@ -1,13 +1,13 @@
 import React from 'react'
 import Footer from './Footer';
-import Features from './Features';
+import Roles from './Roles';
 import Services from './Services';
 
 function Home() {
   return (
     <>
         <Services/>
-        <Features/>
+        <Roles/>
         <Footer/>
     </>
   )

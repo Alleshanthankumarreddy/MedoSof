@@ -3,7 +3,7 @@ import axios from "axios";
 import { AppContext } from "../AppContext";
 
 function AddVendorMedicine() {
-  const { vendor,user,token,backendUrl } = useContext(AppContext);
+  const { vendor,user,token,backendUrl,role } = useContext(AppContext);
   const [medicineCode, setMedicineCode] = useState("");
   const [message, setMessage] = useState("");
 
@@ -22,7 +22,8 @@ function AddVendorMedicine() {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
+            "x-user-role": role
           }
         }
       );
