@@ -33,7 +33,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = `${backendUrl}api/${person}/${state.toLowerCase()}`;
+      const endpoint = `${backendUrl}/api/${person}/${state.toLowerCase()}`;
       const response = await axios.post(endpoint, formData);
       const data = response.data;
 

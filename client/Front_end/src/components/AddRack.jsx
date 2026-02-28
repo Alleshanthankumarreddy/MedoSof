@@ -35,7 +35,7 @@ function AddRack({ onSuccess }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        `${backendUrl}api/rack/addRack`,
+        `${backendUrl}/api/rack/addRack`,
         { rackCode, shopCode, position },
         {
           headers: { Authorization: `Bearer ${token}`, "x-user-role": role },

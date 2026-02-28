@@ -42,7 +42,7 @@ function Vendors() {
       setLoading(true);
       const token = localStorage.getItem("token");
 
-      const res = await axios.get(`${backendUrl}api/vendor/showAllVendors`, {
+      const res = await axios.get(`${backendUrl}/api/vendor/showAllVendors`, {
         headers: { Authorization: `Bearer ${token}`, "x-user-role": role },
       });
 

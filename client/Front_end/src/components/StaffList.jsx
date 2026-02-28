@@ -10,7 +10,7 @@ const StaffList = () => {
     if (!owner) return;
     const fetchStaff = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/staff/getAllStaff/${shopCode}`,
+        const res = await axios.get(`${backendUrl}/api/staff/getAllStaff/${shopCode}`,
              {
         headers: { Authorization: `Bearer ${token}` },
         });

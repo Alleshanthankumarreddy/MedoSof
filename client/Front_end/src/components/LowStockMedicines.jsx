@@ -49,7 +49,7 @@ function LowStockMedicines() {
       }
 
       const response = await axios.post(
-        `${backendUrl}api/medicine/getLowStockMedicines`,
+        `${backendUrl}/api/medicine/getLowStockMedicines`,
         { shopCode },
         {
           headers: { Authorization: `Bearer ${token}`, "x-user-role": role },

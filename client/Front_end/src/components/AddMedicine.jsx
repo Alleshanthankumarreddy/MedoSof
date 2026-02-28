@@ -39,7 +39,7 @@ function AddMedicine({ onMedicineAdded }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        `${backendUrl}api/medicine/addMedicine`,
+        `${backendUrl}/api/medicine/addMedicine`,
         formData,
         {
           headers: {

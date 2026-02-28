@@ -49,7 +49,7 @@ function GenerateReceiptBtn() {
       const shopCode = localStorage.getItem("shopCode");
 
       const response = await axios.post(
-        `${backendUrl}api/sales/addSales`,
+        `${backendUrl}/api/sales/addSales`,
         {
           shopCode,
           listOfMedicines: listOfMedicines.map((m) => ({

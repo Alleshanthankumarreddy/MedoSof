@@ -56,7 +56,7 @@ function VendorMedicines() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${backendUrl}api/vendor/listOfMedicinesSupplied`,
+        `${backendUrl}/api/vendor/listOfMedicinesSupplied`,
         {
           params: { mail: vendorMail },
           headers: { Authorization: `Bearer ${token}`, "x-user-role": role }
@@ -87,7 +87,7 @@ function VendorMedicines() {
   const handleDelete = async (medicineCode) => {
     try {
       const res = await axios.delete(
-        `${backendUrl}api/vendor/deleteMedicines`,
+        `${backendUrl}/api/vendor/deleteMedicines`,
         {
           data: { vendorMail, medicineCode },
           headers: {

@@ -62,7 +62,7 @@ function ExpiredMedicines() {
       const shopCode = localStorage.getItem("shopCode");
 
       const res = await axios.post(
-        `${backendUrl}api/batch/expiredMedicines`,
+        `${backendUrl}/api/batch/expiredMedicines`,
         { shopCode },
         { headers: {
            Authorization: `Bearer ${token}`,
@@ -122,7 +122,7 @@ function ExpiredMedicines() {
       const shopCode = localStorage.getItem("shopCode");
 
       const res = await axios.delete(
-        `${backendUrl}api/batch/removeExpiredMedicines`,
+        `${backendUrl}/api/batch/removeExpiredMedicines`,
         {
           headers: { Authorization: `Bearer ${token}`, "x-user-role": role },
           data: { shopCode },

@@ -15,7 +15,7 @@ function AddVendorMedicine() {
 
     try {
       const res = await axios.post(
-        `${backendUrl}api/vendor/addVendorMedicine`,
+        `${backendUrl}/api/vendor/addVendorMedicine`,
         {
           medicineCode,
           vendorMail: user.mail,

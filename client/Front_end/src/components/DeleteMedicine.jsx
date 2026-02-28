@@ -22,7 +22,7 @@ function DeleteMedicine({ medicine, onClose, onDeleteSuccess }) {
     try {
       setLoading(true);
       const response = await axios.delete(
-        `${backendUrl}api/medicine/deleteMedicine`,
+        `${backendUrl}/api/medicine/deleteMedicine`,
         {
           headers: { 
             Authorization: `Bearer ${token}`,

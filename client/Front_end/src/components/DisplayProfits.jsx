@@ -54,7 +54,7 @@ function LastWeekSales() {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        `${backendUrl}api/sales/getLastWeekSales`,
+        `${backendUrl}/api/sales/getLastWeekSales`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

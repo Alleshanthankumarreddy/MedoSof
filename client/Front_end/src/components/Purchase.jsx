@@ -58,7 +58,7 @@ function Purchase() {
 
       // 1️⃣ Add purchase record
       await axios.post(
-        `${backendUrl}api/purchase/addPurchase`,
+        `${backendUrl}/api/purchase/addPurchase`,
         {
           medicineCode: selectedMedicine.medicineCode,
           quantity: Number(batchDetails.quantity),
@@ -71,7 +71,7 @@ function Purchase() {
 
       // 2️⃣ Add batch record
       const res = await axios.post(
-        `${backendUrl}api/batch/addBatch`,
+        `${backendUrl}/api/batch/addBatch`,
         {
           medicineCode: selectedMedicine.medicineCode,
           batchCode: batchDetails.batchCode,

@@ -66,13 +66,13 @@ function UpdateMedicine({ medicine, onClose, onUpdateSuccess }) {
 
       // Choose API endpoint and payload based on selected option
       if (selectedOption === "rack") {
-        url = `${backendUrl}api/medicine/updateRackCode`;
+        url = `${backendUrl}/api/medicine/updateRackCode`;
         payload.newRackCode = inputValue;
       } else if (selectedOption === "sellingPrice") {
-        url = `${backendUrl}api/medicine/updateUnitSellingPrice`;
+        url = `${backendUrl}/api/medicine/updateUnitSellingPrice`;
         payload.newUnitSellingPrice = Number(inputValue);
       } else if (selectedOption === "costPrice") {
-        url = `${backendUrl}api/medicine/updateUnitCostPrice`;
+        url = `${backendUrl}/api/medicine/updateUnitCostPrice`;
         payload.newUnitCostPrice = Number(inputValue);
       }
 

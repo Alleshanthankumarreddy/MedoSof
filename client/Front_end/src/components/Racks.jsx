@@ -42,7 +42,7 @@ function RackList() {
       }
 
       const response = await axios.post(
-        `${backendUrl}api/rack/showAllRacks`,
+        `${backendUrl}/api/rack/showAllRacks`,
         { shopCode },
         {
           headers: { 

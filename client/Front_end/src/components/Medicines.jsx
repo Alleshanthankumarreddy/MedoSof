@@ -26,7 +26,7 @@ function Medicines() {
       if (!token || !shopCode) return;
 
       const response = await axios.post(
-        `${backendUrl}api/medicine/getAllMedicines`,
+        `${backendUrl}/api/medicine/getAllMedicines`,
         { shopCode },
         {
           headers: { Authorization: `Bearer ${token}`,"x-user-role": role },

@@ -18,7 +18,7 @@ function DeleteRack({ rack, onClose, onSuccess }) {
       const token = localStorage.getItem("token");
       const shopCode = localStorage.getItem("shopCode");
 
-      const response = await axios.delete(`${backendUrl}api/rack/deleteRack`, {
+      const response = await axios.delete(`${backendUrl}/api/rack/deleteRack`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           "x-user-role": role 
