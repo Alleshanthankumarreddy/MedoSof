@@ -29,6 +29,9 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(loggedUser)); setUser(loggedUser);
       setOwner(person === "owner"); setStaff(person === "staff"); setVendor(person === "vendor");
       setShowLogin(false);
+      if (person === "vendor") {
+      navigate("/vendormedicines");
+      }
     } catch (error) { alert(error.response?.data?.message || "Server error"); }
   };
 

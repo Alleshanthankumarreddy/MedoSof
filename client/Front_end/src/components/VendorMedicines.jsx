@@ -146,6 +146,9 @@ function VendorMedicines() {
           <p className="text-sm sm:text-base lg:text-lg text-gray-600 max-w-2xl mx-auto px-2">
             View and manage the medicines you supply to pharmacies
           </p>
+          <p>
+           ( Medicine you supply should be present atleast in any one of the Medicine Shop registered )
+          </p>
         </div>
 
         {/* Search and Actions Bar */}
