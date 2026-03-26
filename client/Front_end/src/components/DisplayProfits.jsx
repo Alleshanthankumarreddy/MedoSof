@@ -14,18 +14,27 @@ function LastWeekSales() {
   const [stats, setStats] = useState({ total: 0, average: 0, highest: 0, lowest: 0, growth: 0, transactions: 0 });
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState("week");
-  const { role, backendUrl } = useContext(AppContext);
+  const { role, backendUrl, shopCode } = useContext(AppContext);
 
-  useEffect(() => { fetchSales(); }, [period]);
+  useEffect(() => { fetchSales(); }, []);
 
   const fetchSales = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get(`${backendUrl}/api/sales/getLastWeekSales`, {
-        headers: { Authorization: `Bearer ${token}`, "x-user-role": role }
-      });
-      const sales = response.data.sales || [];
+      console.log(shopCode);
+      const response = await axios.get(
+      `${backendUrl}/api/sales/getLastWeekSales`,
+        {
+          params: { shopCode },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-user-role": role,
+          },
+        }
+      );
+      const sales = response.sales || [];
+      console.log(sales);
       const grouped = groupByDay(sales);
       setSalesData(grouped);
       const total = grouped.reduce((sum, d) => sum + d.sales, 0);

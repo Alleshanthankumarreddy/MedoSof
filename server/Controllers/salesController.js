@@ -117,33 +117,46 @@ const addSales = async (req, res) => {
 
 const getLastWeekSales = async (req, res) => {
   try {
-    const shopCode = req.user.shopCode; // from auth middleware
+    const { shopCode } = req.query;
 
-    const today = new Date();
+    if (!shopCode) {
+      return res.status(400).json({
+        success: false,
+        message: "Shop code required"
+      });
+    }
 
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(23, 59, 59, 999);
+    // ✅ TODAY end (not yesterday)
+    const endDate = new Date();
+    endDate.setHours(23, 59, 59, 999);
 
-    const lastWeekStart = new Date(yesterday);
-    lastWeekStart.setDate(lastWeekStart.getDate() - 6);
-    lastWeekStart.setHours(0, 0, 0, 0);
+    // ✅ 7 days before today
+    const startDate = new Date(endDate);
+    startDate.setDate(startDate.getDate() - 6);
+    startDate.setHours(0, 0, 0, 0);
+
+    console.log("DATE RANGE:", startDate, endDate);
 
     const sales = await salesModel.find({
-      shopCode,
-      time: { $gte: lastWeekStart, $lte: yesterday },
-    });
+      shopCode: shopCode.trim(),
+      time: {
+        $gte: startDate,
+        $lte: endDate
+      }
+    }).sort({ time: -1 });
+
+    console.log("Sales found:", sales.length);
 
     res.status(200).json({
       success: true,
-      sales,
+      sales
     });
 
   } catch (error) {
     console.error(error);
     res.status(500).json({
       success: false,
-      message: "Error fetching last week's sales",
+      message: "Error fetching sales"
     });
   }
 };
